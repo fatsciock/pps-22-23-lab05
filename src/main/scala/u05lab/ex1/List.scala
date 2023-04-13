@@ -60,45 +60,19 @@ enum List[A]:
 
   /** EXERCISES */
   def zipRight: List[(A, Int)] =
-    /*  Il problema è che t.length produce i valori desiderati ma al contrario
-        al posto di 0 1 2 3
-        giustamente produce 3 2 1 0
-        e non so come evitarlo
-    this match
-      case h :: t => (h, t.length) :: t.zipRight
-      case _ => Nil()
-    */
-    var res: List[(A, Int)] = Nil()
-    var i = 0
-    for el <- this do
-      res = res.append(List((el, i)))
-      i = i+1
-    res
+    var cont = -1
+    map(el => {cont += 1; (el, cont)})
+
 
   def partition(pred: A => Boolean): (List[A], List[A]) =
-    var trueList: List[A] = Nil()
-    var falseList: List[A] = Nil()
-    for el <- this do
-      if(pred(el))
-        trueList = trueList.append(List(el))
-      else
-        falseList = falseList.append(List(el))
-    (trueList, falseList)
+    (filter(pred), filter(!pred(_)))
 
   def span(pred: A => Boolean): (List[A], List[A]) =
-    var beforeList: List[A] = Nil()
-    var afterList: List[A] = Nil()
-    var splitFound = false
-    for el <- this do
-      if(splitFound)
-        afterList = afterList.append(List(el))
-      else
-        if (pred(el))
-          beforeList = beforeList.append(List(el))
-        else
-          splitFound = true
-          afterList = afterList.append(List(el))
-    (beforeList, afterList)
+    innerSpan(partition(pred)._2.head.get)
+
+  private def innerSpan(splitPoint: A): (List[A], List[A]) = this match
+    case h :: t if h != splitPoint => (h :: t.innerSpan(splitPoint)._1, t.innerSpan(splitPoint)._2)
+    case _ => (Nil(), this)
 
   /** @throws UnsupportedOperationException if the list is empty */
   def reduce(op: (A, A) => A): A = this match
@@ -106,15 +80,10 @@ enum List[A]:
     case h :: Nil() => h
     case h :: t => op(h, t.reduce(op))
 
-  def takeRight(n: Int): List[A] =
-    val reversed = this.reverse()
-    var result: List[A] = Nil()
-    var idx = 0
-    for el <- reversed do
-      if (idx < n)
-        result = result.append(List(reversed.get(idx).get))
-        idx += 1
-    result.reverse()
+  def takeRight(n: Int): List[A] = this match
+    case _ :: t if n < length => t takeRight n
+    case _ :: _ => this
+    case _ => Nil()
 
 // Factories
 object List:

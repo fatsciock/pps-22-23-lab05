@@ -34,5 +34,6 @@ class ListTest {
   @Test
   def testTakeRight(): Unit =
     assertEquals(List(2, 3, 4), lst.takeRight(3))
+    assertEquals(List(2, 2, 3), List(1,1,1,2,2,3).takeRight(3))
 
 }
