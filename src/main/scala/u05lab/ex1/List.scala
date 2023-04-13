@@ -59,16 +59,62 @@ enum List[A]:
   def reverse(): List[A] = foldLeft[List[A]](Nil())((l, e) => e :: l)
 
   /** EXERCISES */
-  def zipRight: List[(A, Int)] = ???
+  def zipRight: List[(A, Int)] =
+    /*  Il problema è che t.length produce i valori desiderati ma al contrario
+        al posto di 0 1 2 3
+        giustamente produce 3 2 1 0
+        e non so come evitarlo
+    this match
+      case h :: t => (h, t.length) :: t.zipRight
+      case _ => Nil()
+    */
+    var res: List[(A, Int)] = Nil()
+    var i = 0
+    for el <- this do
+      res = res.append(List((el, i)))
+      i = i+1
+    res
 
-  def partition(pred: A => Boolean): (List[A], List[A]) = ???
+  def partition(pred: A => Boolean): (List[A], List[A]) =
+    var trueList: List[A] = Nil()
+    var falseList: List[A] = Nil()
+    for el <- this do
+      if(pred(el))
+        trueList = trueList.append(List(el))
+      else
+        falseList = falseList.append(List(el))
+    (trueList, falseList)
 
-  def span(pred: A => Boolean): (List[A], List[A]) = ???
+  def span(pred: A => Boolean): (List[A], List[A]) =
+    var beforeList: List[A] = Nil()
+    var afterList: List[A] = Nil()
+    var splitFound = false
+    for el <- this do
+      if(splitFound)
+        afterList = afterList.append(List(el))
+      else
+        if (pred(el))
+          beforeList = beforeList.append(List(el))
+        else
+          splitFound = true
+          afterList = afterList.append(List(el))
+    (beforeList, afterList)
 
   /** @throws UnsupportedOperationException if the list is empty */
-  def reduce(op: (A, A) => A): A = ???
+  def reduce(op: (A, A) => A): A = this match
+    case Nil() => throw new UnsupportedOperationException
+    case h :: Nil() => h
+    case h :: t => op(h, t.reduce(op))
 
-  def takeRight(n: Int): List[A] = ???
+  def takeRight(n: Int): List[A] =
+    val reversed = this.reverse()
+    var result: List[A] = Nil()
+    var idx = 0
+    for el <- reversed do
+      if (idx < n)
+        result = result.append(List(reversed.get(idx).get))
+        idx += 1
+    result.reverse()
 
 // Factories
 object List:
@@ -92,3 +138,4 @@ object List:
   catch case ex: Exception => println(ex) // prints exception
   println(List(10).reduce(_ + _)) // 10
   println(reference.takeRight(3)) // List(2, 3, 4)
+
