@@ -60,13 +60,22 @@ enum List[A]:
 
   /** EXERCISES */
   def zipRight: List[(A, Int)] =
-    var cont = -1
-    map(el => {cont += 1; (el, cont)})
+    /*var cont = -1
+    map(el => {cont += 1; (el, cont)})*/
+    foldRight(Nil())((a, s) => s match
+      case (_, i) :: _ => (a, i - 1) :: s
+      case Nil() => (a, length - 1) :: s)
 
   def partition(pred: A => Boolean): (List[A], List[A]) =
     (filter(pred), filter(!pred(_)))
 
+
   def span(pred: A => Boolean): (List[A], List[A]) =
+    foldLeft((Nil(), Nil()))((list, e) => list match
+      case (lst1, lst2) if pred(e) && lst2.isEmpty => (lst1 append List(e), lst2)
+      case (lst1, lst2) => (lst1, lst2 append List(e)))
+
+  def spanRec(pred: A => Boolean): (List[A], List[A]) =
     innerSpan(partition(pred)._2.head.get)
 
   private def innerSpan(splitPoint: A): (List[A], List[A]) = this match
@@ -76,15 +85,19 @@ enum List[A]:
   /** @throws UnsupportedOperationException if the list is empty */
   def reduce(op: (A, A) => A): A = this match
     case Nil() => throw new UnsupportedOperationException
-    case h :: Nil() => h
-    case h :: t => op(h, t.reduce(op))
+    case h :: t => t.foldLeft(h)(op)
 
-  def takeRight(n: Int): List[A] = this match
-    case _ :: t if n < length => t takeRight n
+  def takeRightRec(n: Int): List[A] = this match
+    case _ :: t if n < length => t takeRightRec n
     case _ => this
 
+  def takeRight(n: Int): List[A] =
+    foldRight(Nil())((e, lst) => lst match
+      case _ if lst.length < n => e :: lst
+      case _ => lst)
+
   def collect[B](pf: PartialFunction[A, B]): List[B] =
-    foldRight(Nil())((e, list) => if (pf.isDefinedAt(e)) pf(e) :: list else list)
+    filter(pf.isDefinedAt).map(pf)
 
 
 // Factories
