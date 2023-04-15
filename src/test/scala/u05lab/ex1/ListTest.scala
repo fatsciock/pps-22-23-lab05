@@ -36,4 +36,8 @@ class ListTest {
     assertEquals(List(2, 3, 4), lst.takeRight(3))
     assertEquals(List(2, 2, 3), List(1,1,1,2,2,3).takeRight(3))
 
+  @Test
+  def testCollect(): Unit =
+    assertEquals(List(12, 14), lst collect {case i if i % 2 == 0 => i + 10})
+
 }

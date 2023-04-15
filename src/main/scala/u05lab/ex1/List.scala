@@ -63,7 +63,6 @@ enum List[A]:
     var cont = -1
     map(el => {cont += 1; (el, cont)})
 
-
   def partition(pred: A => Boolean): (List[A], List[A]) =
     (filter(pred), filter(!pred(_)))
 
@@ -82,8 +81,11 @@ enum List[A]:
 
   def takeRight(n: Int): List[A] = this match
     case _ :: t if n < length => t takeRight n
-    case _ :: _ => this
-    case _ => Nil()
+    case _ => this
+
+  def collect[B](pf: PartialFunction[A, B]): List[B] =
+    foldRight(Nil())((e, list) => if (pf.isDefinedAt(e)) pf(e) :: list else list)
+
 
 // Factories
 object List:
