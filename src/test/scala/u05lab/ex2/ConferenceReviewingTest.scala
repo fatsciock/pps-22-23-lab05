@@ -5,7 +5,7 @@ import org.junit.{Before, Test}
 
 class ConferenceReviewingTest {
 
-  val cr: ConferenceReviewing = ConferenceReviewingImpl(List())
+  val cr: ConferenceReviewing = ConferenceReviewingImpl()
 
   @Before
   def init(): Unit =
@@ -52,5 +52,5 @@ class ConferenceReviewingTest {
     assertEquals((0.9+1.6)/2, cr.averageWeightedFinalScoreMap()(3),0.01)
     assertEquals((3.6+5.6+5.6)/3, cr.averageWeightedFinalScoreMap()(4),0.01)
     assertEquals((6.0+7.0)/2, cr.averageWeightedFinalScoreMap()(5),0.01)
-    assertEquals(5, cr.averageWeightedFinalScoreMap().size);
+    assertEquals(5, cr.averageWeightedFinalScoreMap().size)
 }
